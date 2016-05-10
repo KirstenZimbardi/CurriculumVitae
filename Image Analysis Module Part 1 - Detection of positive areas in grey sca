@@ -1,0 +1,171 @@
+//* Part 1 Detection of positive areas in grey scale images
+//* The following group of variables is used to open, process and save files sequentially
+//* i is a counter and counts from nstart (first file number, e.g. 1) to nfinish (last file number, e.g. 20)
+//* stip is a string of characters equal to the folder path of all files to be opened and processed
+//* stpp is a string of characters equal to the folder path where the processed files are to be saved
+//* st is a string that contains the file number (e.g. 01, 02, 03, ....)
+//* sifn is a string that contains the full file name of the file to be opened and processed. That is, the path, file number, file letter (B, F, G, R) and the extension (.tif)
+//* sofn is a string that contains the full file name of the file to be saved.
+int i;
+int nfinish, nstart; char stip[255]; char stpp[255]; char st[4];
+char sifn[255]; char sofn[255];
+//* The following group of variables is used to define the scale of the images
+//* iun is the units of the scale (um)
+//* scv is the value of 1 pixel in scale units
+STUNIT iun; double scv;
+//* Define start and finish file numbers nstart=1;
+nfinish=20;
+//* Define input and output paths strcpy(stip,"D:\\analysis\\KFarrand\\TBD\\"); strcpy(stpp,"D:\\analysis\\KFarrand\\TBD\\Detected\\");
+//* Define scale as micron (um) and um per pixel as 0.16801 untSet(&iun,UNIT_METER,US_MICRO,UP_LINEAR); scv=0.16801;
+//* Start processing
+cls();
+DeleteAllImages();
+//* Loop over all file numbers in steps of 1 for (i=nstart;i<=nfinish;++i)
+{
+DeleteAllImages();
+//**********************************Nuclei*************************************** ****
+Op.Display=4;
+//* place the full name of file to be opened into sifn by concatenating all the parts into 1
+strcpy(sifn,stip); sprintf(st,"%02d",i); strcat(sifn,st); strcat(sifn,"B.tif");
+//* place the full name of file to be saved into sofn by concatenating all the parts into 1
+strcpy(sofn,stpp);
+strcat(sofn,st);
+strcat(sofn,"B.tif");
+//* Check if file to be opened exists. If exists process, if not skip if (sysExistsFile(sifn))
+{
+printf("Processing %s\n",sifn);
+//* The following hides the command window Op.Display=Op.Display;
+Open(FileName:=sifn);
+//* Open(FileName:="D:\\analysis\\KFarrand\\TBD\\01B.tif"); //* Set scale for current display (4). X and Y are the same
+imgSetUnit (Op.Display, IMGP_XUNIT, &iun); imgSetUnit (Op.Display, IMGP_YUNIT, &iun); imgSetScaleX(Op.Display, scv); imgSetScaleY(Op.Display, scv);
+//* SetMagnification(5952, US_MICRO);
+//* Could have used the following to set units
+//* imgSetUnitX (Op.Display, UNIT_METER,US_MICRO,UP_LINEAR); //* imgSetUnitY (Op.Display, UNIT_METER,US_MICRO,UP_LINEAR); //* This would have removed the need to define the variable iun
+//* but the use of iun is an example of passing a long pointer
+Op.Dest=8; Op.MaskEnable=FALSE; {
+HTHRESHOLD hThr = thrCreate (70, 255 ); thrSave(hThr, NULL);
+thrDestroy(&hThr);
+}
+SetGrayThresholds$(Thresholds:=NULL, AutoName:=NULL); BinarizeGrayScaleImage(Thresholds:=NULL, Phase:=-1);
+Op.Display=8; Op.Dest=8;
+MorphClose();
+Op.Display=8; Op.Dest=8; SeparateParticles();
+Op.Display=8;
+claDeleteClassification ("Nuclei detect"); {
+CLASSINFO wItems [] = { {0, 575, "0", OVL_WHITE},
+};
+DefineClassification(Name:="Nuclei detect", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=1000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Nuclei detect", LabelMinPixel:=1, OutlineStyle:=0, LabelType:=0,
+LabelColor:=2, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect();
+Op.Display=8; Op.Dest=12; DistanceBright(); Op.Display=12; BurnOverlay();
+Op.Display=12;
+Op.Dest=12; BinarizeGrayScaleImage(Thresholds:=NULL, Phase:=0); Op.Display=12;
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Detected\\01B.tif"); }
+else
+printf("Not processing %s. File doesn't exist\n",sifn); //**********************************R*************************************** Op.Display=1;
+Op.MaskEnable=FALSE;
+strcpy(sifn,stip); sprintf(st,"%02d",i); strcat(sifn,st); strcat(sifn,"R.tif");
+strcpy(sofn,stpp); strcat(sofn,st);
+strcat(sofn,"R.tif");
+if (sysExistsFile(sifn))
+{
+printf("Processing %s\n",sifn);
+Open(FileName:=sifn);
+//* Open(FileName:="D:\\analysis\\KFarrand\\TBD\\01R.tif");
+imgSetUnit (Op.Display, IMGP_XUNIT, &iun); imgSetUnit (Op.Display, IMGP_YUNIT, &iun);
+imgSetScaleX(Op.Display, scv); imgSetScaleY(Op.Display, scv);
+//* SetMagnification(5952, US_MICRO); {
+HTHRESHOLD hThr = thrCreate (120, 255 ); thrSave(hThr, NULL);
+thrDestroy(&hThr);
+}
+SetGrayThresholds$(Thresholds:=NULL, AutoName:=NULL); claDeleteClassification ("Cyto detect");
+{
+CLASSINFO wItems [] = {
+{0, 16030, "0", OVL_WHITE},
+};
+DefineClassification(Name:="Cyto detect", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cyto detect", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect();
+Op.Dest=5; DistanceBright(); Op.Display=5; BurnOverlay();
+Op.Display=5;
+Op.Dest=5; BinarizeGrayScaleImage(Thresholds:=NULL, Phase:=0); Op.Display=5;
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Detected\\01R.tif"); }
+else
+printf("Not processing %s. File doesn't exist\n",sifn);
+
+//**********************************F***************************************** Op.Display=2;
+Op.MaskEnable=FALSE;
+strcpy(sifn,stip); sprintf(st,"%02d",i); strcat(sifn,st); strcat(sifn,"F.tif");
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"F.tif");
+if (sysExistsFile(sifn))
+{
+printf("Processing %s\n",sifn); Open(FileName:=sifn);
+//* Open(FileName:="D:\\analysis\\KFarrand\\TBD\\01F.tif");
+imgSetUnit (Op.Display, IMGP_XUNIT, &iun); imgSetUnit (Op.Display, IMGP_YUNIT, &iun);
+imgSetScaleX(Op.Display, scv); imgSetScaleY(Op.Display, scv);
+//* SetMagnification(5952, US_MICRO);
+{
+}
+SetGrayThresholds$(Thresholds:=NULL, AutoName:=NULL); claDeleteClassification ("Cyto detect");
+{
+CLASSINFO wItems [] = {
+{0, 16030, "0", OVL_WHITE},
+};
+DefineClassification(Name:="Cyto detect", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cyto detect", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect();
+HTHRESHOLD hThr = thrCreate (120, 255 ); thrSave(hThr, NULL);
+thrDestroy(&hThr);
+Op.Dest=6; DistanceBright(); Op.Display=6; BurnOverlay();
+Op.Display=6;
+Op.Dest=6; BinarizeGrayScaleImage(Thresholds:=NULL, Phase:=0); Op.Display=6;
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Detected\\01F.tif"); }
+else
+printf("Not processing %s. File doesn't exist\n",sifn); //**********************************G***************************************** Op.Display=3;
+Op.MaskEnable=FALSE;
+strcpy(sifn,stip); sprintf(st,"%02d",i); strcat(sifn,st); strcat(sifn,"G.tif");
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"G.tif");
+if (sysExistsFile(sifn))
+{
+printf("Processing %s\n",sifn); Open(FileName:=sifn);
+//* Open(FileName:="D:\\analysis\\KFarrand\\TBD\\01G.tif");
+imgSetUnit (Op.Display, IMGP_XUNIT, &iun); imgSetUnit (Op.Display, IMGP_YUNIT, &iun);
+imgSetScaleX(Op.Display, scv); imgSetScaleY(Op.Display, scv);
+//* SetMagnification(5952, US_MICRO); {
+HTHRESHOLD hThr = thrCreate (120, 255 ); thrSave(hThr, NULL);
+thrDestroy(&hThr);
+}
+SetGrayThresholds$(Thresholds:=NULL, AutoName:=NULL); claDeleteClassification ("Cyto detect");
+{
+CLASSINFO wItems [] = {
+{0, 16030, "0", OVL_WHITE}, };
+DefineClassification(Name:="Cyto detect", Unit:="μm2", ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO), Min:=0, Max:=2000, Linear:=1);
+}
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE,
+Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cyto detect", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect();
+Op.Dest=7; DistanceBright(); Op.Display=7; BurnOverlay();
+Op.Display=7;
+Op.Dest=7; BinarizeGrayScaleImage(Thresholds:=NULL, Phase:=0); Op.Display=7;
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Detected\\01G.tif"); }
+else
+printf("Not processing %s. File doesn't exist\n",sifn);
+}

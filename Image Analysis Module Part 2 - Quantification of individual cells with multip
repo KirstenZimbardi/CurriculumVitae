@@ -1,0 +1,325 @@
+//* Part 2 Quantification of individual cells with multiple labels
+int i;
+int ngroups; char stip[255]; char stpp[255]; char st[4];
+char sifn[255]; char sofn[255];
+ngroups=20;
+strcpy(stip,"D:\\analysis\\KFarrand\\TBD\\Detected\\"); strcpy(stpp,"D:\\analysis\\KFarrand\\TBD\\Analysed\\");
+for (i=1;i<=ngroups;++i)
+{
+printf("Processing %s\n",sifn); DeleteAllImages();
+
+//**********************************Open Images************************* //**********************************Nuclei*************************************** Op.Display=8;
+Op.MaskEnable=FALSE;
+strcpy(sifn,stip); sprintf(st,"%02d",i); strcat(sifn,st); strcat(sifn,"B.tif");
+if (sysExistsFile(sifn))
+{
+Open(FileName:=sifn);
+//* Open(FileName:="D:\\analysis\\KFarrand\\TBD\\Detected\\14B.tif");
+claDeleteClassification ("Nuclei"); {
+CLASSINFO wItems [] = {
+{0, 15, "0", OVL_WHITE},
+{15, 50, "1", OVL_BLUE},
+{50, 85, "2", OVL_RED},
+{85, 120, "3", OVL_YELLOW}, {120, 155, "4", OVL_GREEN}, {155, 190, "5", OVL_MAGENTA}, {190, 225, "6", OVL_CYAN}, {225, 260, "7", OVL_WHITE}, {260, 295, "8", OVL_BLUE}, {295, 330, "9", OVL_RED},
+{330, 435, "12", OVL_YELLOW},
+{435, 575, "17", OVL_GREEN}, };
+DefineClassification(Name:="Nuclei", Unit:="μm2", ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO), Min:=0, Max:=1000, Linear:=1);
+}
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE,
+Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Nuclei", LabelMinPixel:=1, OutlineStyle:=0, LabelType:=0,
+LabelColor:=2, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect(); ClassResults$();
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"B.xls");
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Analysed\\14B.xls");
+//**********************************ACTH*************************************** Op.Display=5;
+Op.MaskEnable=FALSE;
+strcpy(sifn,stip);
+//* sprintf(st,"%02d",i); strcat(sifn,st); strcat(sifn,"R.tif");
+Open(FileName:=sifn);
+//* Open(FileName:="D:\\analysis\\KFarrand\\TBD\\Detected\\14R.tif");
+//**********************************CRH R1***************************************** Op.Display=6; Op.MaskEnable=FALSE;
+strcpy(sifn,stip);
+//* sprintf(st,"%02d",i); strcat(sifn,st); strcat(sifn,"F.tif");
+Open(FileName:=sifn);
+//* Open(FileName:="D:\\analysis\\KFarrand\\TBD\\Detected\\14F.tif");
+//**********************************POMC************************************** ***
+Op.Display=7;
+Op.MaskEnable=FALSE;
+strcpy(sifn,stip);
+//* sprintf(st,"%02d",i); strcat(sifn,st); strcat(sifn,"G.tif");
+Open(FileName:=sifn);
+//* Open(FileName:="D:\\analysis\\KFarrand\\TBD\\Detected\\14G.tif");
+//**********************************R, F, G************************* //**********************************R*************************
+Op.Display=5;
+claDeleteClassification ("Cytoplasm 1"); {
+CLASSINFO wItems [] = {
+{0, 50, "0", OVL_WHITE},
+{50, 110, "1", OVL_BLUE}, {110, 190, "2", OVL_RED}, {190, 270, "3", OVL_YELLOW}, {270, 350, "4", OVL_GREEN},
+{350, 430, "5", OVL_MAGENTA}, {430, 510, "6", OVL_CYAN}, {510, 590, "7", OVL_WHITE}, {590, 670, "8", OVL_BLUE}, {670, 750, "9", OVL_RED},
+{750, 1150, "12", OVL_YELLOW}, {1150, 1550, "17", OVL_GREEN}, {1550, 2350, "25", OVL_MAGENTA}, {2350, 3150, "35", OVL_CYAN}, {3150, 3950, "45", OVL_WHITE}, {3950, 5550, "60", OVL_BLUE}, {5550, 7950, "85", OVL_RED},
+{7950, 11950, "125", OVL_YELLOW}, {11950, 16030, "175", OVL_GREEN},
+};
+DefineClassification(Name:="Cytoplasm 1", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cytoplasm 1", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect(); ClassResults$();
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"R.xls");
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Analysed\\14R.xls");
+//**********************************F************************* Op.Display=6;
+claDeleteClassification ("Cytoplasm 1");
+{
+CLASSINFO wItems [] = {
+{0, 50, "0", OVL_WHITE},
+{50, 110, "1", OVL_BLUE},
+{110, 190, "2", OVL_RED},
+{190, 270, "3", OVL_YELLOW}, {270, 350, "4", OVL_GREEN}, {350, 430, "5", OVL_MAGENTA}, {430, 510, "6", OVL_CYAN}, {510, 590, "7", OVL_WHITE}, {590, 670, "8", OVL_BLUE},
+{670, 750, "9", OVL_RED},
+{750, 1150, "12", OVL_YELLOW}, {1150, 1550, "17", OVL_GREEN}, {1550, 2350, "25", OVL_MAGENTA}, {2350, 3150, "35", OVL_CYAN}, {3150, 3950, "45", OVL_WHITE}, {3950, 5550, "60", OVL_BLUE}, {5550, 7950, "85", OVL_RED},
+{7950, 11950, "125", OVL_YELLOW}, {11950, 16030, "175", OVL_GREEN},
+};
+DefineClassification(Name:="Cytoplasm 1", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cytoplasm 1", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect(); ClassResults$();
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"F.xls");
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Analysed\\14F.xls");
+//**********************************G************************* Op.Display=7;
+claDeleteClassification ("Cytoplasm 1");
+{
+CLASSINFO wItems [] = {
+{0, 50, "0", OVL_WHITE},
+{50, 110, "1", OVL_BLUE},
+{110, 190, "2", OVL_RED},
+{190, 270, "3", OVL_YELLOW}, {270, 350, "4", OVL_GREEN}, {350, 430, "5", OVL_MAGENTA}, {430, 510, "6", OVL_CYAN}, {510, 590, "7", OVL_WHITE}, {590, 670, "8", OVL_BLUE}, {670, 750, "9", OVL_RED},
+{750, 1150, "12", OVL_YELLOW}, {1150, 1550, "17", OVL_GREEN}, {1550, 2350, "25", OVL_MAGENTA},
+{2350, 3150, "35", OVL_CYAN}, {3150, 3950, "45", OVL_WHITE}, {3950, 5550, "60", OVL_BLUE}, {5550, 7950, "85", OVL_RED},
+{7950, 11950, "125", OVL_YELLOW}, {11950, 16030, "175", OVL_GREEN},
+};
+DefineClassification(Name:="Cytoplasm 1", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cytoplasm 1", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect(); ClassResults$();
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"G.xls");
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Analysed\\14G.xls");
+//**********************************Calculations************************* //**********************************R-F************************* Op.Source1=5;
+Op.Source2=6;
+Op.Dest=9; AbsoluteSubtraction();
+//**********************************R-G************************* Op.Source1=5;
+Op.Source2=7;
+Op.Dest=13;
+AbsoluteSubtraction();
+//**********************************R-F-G************************* Op.Source1=9;
+Op.Source2=7;
+Op.Dest=17;
+AbsoluteSubtraction();
+//**********************************F-R************************* Op.Source1=6;
+Op.Source2=5;
+Op.Dest=10; AbsoluteSubtraction();
+//**********************************F-R-G************************* Op.Source1=10;
+Op.Source2=7;
+Op.Dest=18;
+AbsoluteSubtraction();
+//**********************************G-R************************* Op.Source1=7;
+Op.Source2=5;
+Op.Dest=11;
+AbsoluteSubtraction();
+//**********************************G-R-F************************* Op.Source1=11;
+Op.Source2=6;
+Op.Dest=19;
+AbsoluteSubtraction();
+//**********************************RF=(R-G)-(R-F-G)************************* Op.Source1=13;
+Op.Source2=17;
+Op.Dest=21;
+AbsoluteSubtraction();
+//**********************************RG=(R-F)-(R-F-G)************************* Op.Source1=9;
+Op.Source2=17;
+Op.Dest=25;
+AbsoluteSubtraction();
+//**********************************FG=(F-R)-(F-R-G)************************* Op.Source1=10;
+Op.Source2=18;
+Op.Dest=26;
+AbsoluteSubtraction();
+//**********************************RFG:(Ro+RF)************************* Op.Source1=17;
+Op.Source2=21;
+Op.Dest=12;
+AbsoluteAddition();
+//**********************************RFG:((Ro+RF)+RG)*********************** **
+Op.Source1=12;
+Op.Source2=25;
+Op.Dest=16; AbsoluteAddition();
+
+//**********************************RFG=R- (Ro+RF+RG)************************* Op.Source1=5;
+Op.Source2=16;
+Op.Dest=20; AbsoluteSubtraction();
+//**********************************Detections*************************
+//**********************************Ro=(R-F-G)************************* Op.Display=17;
+claDeleteClassification ("Cytoplasm 2");
+{
+CLASSINFO wItems [] = {
+{0, 60, "0", OVL_WHITE},
+{60, 100, "1", OVL_BLUE},
+{100, 170, "2", OVL_RED},
+{170, 240, "3", OVL_YELLOW}, {240, 310, "4", OVL_GREEN}, {310, 380, "5", OVL_MAGENTA}, {380, 450, "6", OVL_CYAN}, {450, 520, "7", OVL_WHITE}, {520, 590, "8", OVL_BLUE}, {590, 660, "9", OVL_RED},
+{660, 1010, "12", OVL_YELLOW}, {1010, 1360, "17", OVL_GREEN}, {1360, 2060, "25", OVL_MAGENTA}, {2060, 2760, "35", OVL_CYAN}, {2760, 3460, "45", OVL_WHITE}, {3460, 4860, "60", OVL_BLUE}, {4860, 6960, "85", OVL_RED},
+{6960, 10460, "125", OVL_YELLOW}, {10460, 14030, "175", OVL_GREEN},
+};
+DefineClassification(Name:="Cytoplasm 2", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cytoplasm 2", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect(); ClassResults$();
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"RO.xls");
+
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Analysed\\14RO.xls");
+//**********************************Fo=(F-R-G)************************* Op.Display=18;
+claDeleteClassification ("Cytoplasm 2"); {
+CLASSINFO wItems [] = {
+{0, 60, "0", OVL_WHITE},
+{60, 100, "1", OVL_BLUE},
+{100, 170, "2", OVL_RED},
+{170, 240, "3", OVL_YELLOW}, {240, 310, "4", OVL_GREEN}, {310, 380, "5", OVL_MAGENTA}, {380, 450, "6", OVL_CYAN}, {450, 520, "7", OVL_WHITE}, {520, 590, "8", OVL_BLUE}, {590, 660, "9", OVL_RED},
+{660, 1010, "12", OVL_YELLOW}, {1010, 1360, "17", OVL_GREEN}, {1360, 2060, "25", OVL_MAGENTA}, {2060, 2760, "35", OVL_CYAN}, {2760, 3460, "45", OVL_WHITE}, {3460, 4860, "60", OVL_BLUE}, {4860, 6960, "85", OVL_RED},
+{6960, 10460, "125", OVL_YELLOW}, {10460, 14030, "175", OVL_GREEN},
+};
+DefineClassification(Name:="Cytoplasm 2", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cytoplasm 2", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect(); ClassResults$();
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"FO.xls");
+
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Analysed\\14FO.xls");
+//**********************************Go=(G-R-F)************************* Op.Display=19;
+claDeleteClassification ("Cytoplasm 2");
+{
+CLASSINFO wItems [] = {
+{0, 60, "0", OVL_WHITE},
+{60, 100, "1", OVL_BLUE},
+{100, 170, "2", OVL_RED},
+{170, 240, "3", OVL_YELLOW}, {240, 310, "4", OVL_GREEN}, {310, 380, "5", OVL_MAGENTA}, {380, 450, "6", OVL_CYAN}, {450, 520, "7", OVL_WHITE}, {520, 590, "8", OVL_BLUE}, {590, 660, "9", OVL_RED},
+{660, 1010, "12", OVL_YELLOW}, {1010, 1360, "17", OVL_GREEN}, {1360, 2060, "25", OVL_MAGENTA}, {2060, 2760, "35", OVL_CYAN}, {2760, 3460, "45", OVL_WHITE}, {3460, 4860, "60", OVL_BLUE}, {4860, 6960, "85", OVL_RED},
+{6960, 10460, "125", OVL_YELLOW}, {10460, 14030, "175", OVL_GREEN},
+};
+DefineClassification(Name:="Cytoplasm 2", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cytoplasm 2", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect(); ClassResults$();
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"GO.xls");
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Analysed\\14GO.xls");
+
+//**********************************RF************************* Op.Display=21;
+claDeleteClassification ("Cytoplasm 2");
+{
+CLASSINFO wItems [] = {
+{0, 40, "0", OVL_WHITE},
+{40, 100, "1", OVL_BLUE},
+{100, 170, "2", OVL_RED},
+{170, 240, "3", OVL_YELLOW}, {240, 310, "4", OVL_GREEN}, {310, 380, "5", OVL_MAGENTA}, {380, 450, "6", OVL_CYAN}, {450, 520, "7", OVL_WHITE}, {520, 590, "8", OVL_BLUE}, {590, 660, "9", OVL_RED},
+{660, 1010, "12", OVL_YELLOW}, {1010, 1360, "17", OVL_GREEN}, {1360, 2060, "25", OVL_MAGENTA}, {2060, 2760, "35", OVL_CYAN}, {2760, 3460, "45", OVL_WHITE}, {3460, 4860, "60", OVL_BLUE}, {4860, 6960, "85", OVL_RED},
+{6960, 10460, "125", OVL_YELLOW}, {10460, 14030, "175", OVL_GREEN},
+};
+DefineClassification(Name:="Cytoplasm 2", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cytoplasm 2", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect(); ClassResults$();
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"RF.xls");
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Analysed\\14RF.xls");
+//**********************************RG************************* Op.Display=25;
+claDeleteClassification ("Cytoplasm 2");
+
+{
+CLASSINFO wItems [] = {
+{0, 40, "0", OVL_WHITE},
+{40, 100, "1", OVL_BLUE},
+{100, 170, "2", OVL_RED},
+{170, 240, "3", OVL_YELLOW}, {240, 310, "4", OVL_GREEN}, {310, 380, "5", OVL_MAGENTA}, {380, 450, "6", OVL_CYAN}, {450, 520, "7", OVL_WHITE}, {520, 590, "8", OVL_BLUE}, {590, 660, "9", OVL_RED},
+{660, 1010, "12", OVL_YELLOW}, {1010, 1360, "17", OVL_GREEN}, {1360, 2060, "25", OVL_MAGENTA}, {2060, 2760, "35", OVL_CYAN}, {2760, 3460, "45", OVL_WHITE}, {3460, 4860, "60", OVL_BLUE}, {4860, 6960, "85", OVL_RED},
+{6960, 10460, "125", OVL_YELLOW}, {10460, 14030, "175", OVL_GREEN},
+};
+DefineClassification(Name:="Cytoplasm 2", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cytoplasm 2", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect(); ClassResults$();
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"RG.xls");
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Analysed\\14RG.xls");
+//**********************************FG************************* Op.Display=26;
+claDeleteClassification ("Cytoplasm 2b"); {
+CLASSINFO wItems [] = { {0, 15, "0", OVL_WHITE},
+
+{15, 100, "1", OVL_BLUE},
+{100, 170, "2", OVL_RED},
+{170, 240, "3", OVL_YELLOW}, {240, 310, "4", OVL_GREEN}, {310, 380, "5", OVL_MAGENTA}, {380, 450, "6", OVL_CYAN}, {450, 520, "7", OVL_WHITE}, {520, 590, "8", OVL_BLUE}, {590, 660, "9", OVL_RED},
+{660, 1010, "12", OVL_YELLOW}, {1010, 1360, "17", OVL_GREEN}, {1360, 2060, "25", OVL_MAGENTA}, {2060, 2760, "35", OVL_CYAN}, {2760, 3460, "45", OVL_WHITE}, {3460, 4860, "60", OVL_BLUE}, {4860, 6960, "85", OVL_RED},
+{6960, 10460, "125", OVL_YELLOW}, {10460, 14030, "175", OVL_GREEN},
+};
+DefineClassification(Name:="Cytoplasm 2b", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cytoplasm 2b", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect(); ClassResults$();
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"FG.xls");
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Analysed\\14FG.xls");
+//**********************************RFG************************* Op.Display=20;
+claDeleteClassification ("Cytoplasm 3");
+{
+CLASSINFO wItems [] = { {0, 40, "0", OVL_WHITE}, {40, 100, "1", OVL_BLUE},
+
+{100, 170, "2", OVL_RED},
+{170, 240, "3", OVL_YELLOW},
+{240, 310, "4", OVL_GREEN},
+{310, 380, "5", OVL_MAGENTA}, {380, 450, "6", OVL_CYAN},
+{450, 520, "7", OVL_WHITE},
+{520, 590, "8", OVL_BLUE},
+{590, 660, "9", OVL_RED},
+{660, 1010, "12", OVL_YELLOW}, {1010, 1360, "17", OVL_GREEN}, {1360, 2060, "25", OVL_MAGENTA}, {2060, 2760, "35", OVL_CYAN}, {2760, 3460, "45", OVL_WHITE}, {3460, 4860, "60", OVL_BLUE}, {4860, 6960, "85", OVL_RED},
+{6960, 10460, "125", OVL_YELLOW}, {10460, 14030, "175", OVL_GREEN},
+};
+DefineClassification(Name:="Cytoplasm 3", Unit:="μm2",
+ClassArray:=wItems, Bins:=sizeof (wItems) / sizeof (CLASSINFO),
+Min:=0, Max:=2000, Linear:=1); }
+DefineDetection(ROIs:=0, Border:=ANA_BORDER_INCLUDE, Inclusions:=TRUE, MinPixel:=50, Min:=0, Max:=DBL_MAX, Unit:="μm", Connectivity:=ANA_CON_ADJBORDERS, UseRanges:=FALSE);
+ClassifyParticles(Criterium:=M_AREA, Classification:="Cytoplasm 3", LabelMinPixel:=0, OutlineStyle:=0, LabelType:=0,
+LabelColor:=1, ShowLabelName:=FALSE, ShowLabelUnit:=FALSE);
+Detect(); ClassResults$();
+strcpy(sofn,stpp); strcat(sofn,st); strcat(sofn,"RFG.xls");
+SaveAs(FileName:=sofn);
+//* SaveAs(FileName:="D:\\analysis\\KFarrand\\TBD\\Analysed\\14RFG.xls ");
+}
+else
+printf("%s not processed - file not found\n",sifn);
+}
